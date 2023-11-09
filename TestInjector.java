@@ -1,4 +1,4 @@
-package com.dremio.dac.server;
+package com.dremio.daas.application.optimizationservice.server;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
-import com.google.inject.Singleton;
 
 public class TestInjector {
   public static void main(String []args) {
@@ -15,6 +14,7 @@ public class TestInjector {
 //    injector.getInstance(Interface.class);
 //    injector.getProvider(Interface.class);
     InjectionTesting injectionTesting = injector.getInstance(InjectionTesting.class);
+    ClassWithNoBindingInAbstractModule classWithNoBindingInAbstractModule = injector.getInstance(ClassWithNoBindingInAbstractModule.class);
     System.out.println("test injectionTesting");
   }
 }
@@ -23,18 +23,23 @@ interface InjectionTesting {
 }
 class TestInjection implements InjectionTesting {
 
-  Provider<ClassAPI> classAPIProvider;
+  Provider<ClassWithProvidesAnnotationInAbstractModule> classAPIProvider;
   Interface anInterface;
   Provider<Interface> anInterfaceProvider;
+  ClassWithNoBindingInAbstractModule classWithNoBindingInAbstractModule;
 
   @Inject
-  public TestInjection (Provider<ClassAPI> classAPIProvider, Interface anInterface, Provider<Interface> anInterfaceProvider) {
+  public TestInjection (Provider<ClassWithProvidesAnnotationInAbstractModule> classAPIProvider,
+                        Interface anInterface,
+                        Provider<Interface> anInterfaceProvider,
+                        ClassWithNoBindingInAbstractModule classWithNoBindingInAbstractModule) {
     this.classAPIProvider = classAPIProvider;
     this.anInterface = anInterface;
     this.anInterfaceProvider = anInterfaceProvider;
+    this.classWithNoBindingInAbstractModule = classWithNoBindingInAbstractModule;
   }
 
-  public Provider<ClassAPI> getClassAPIProvider() {
+  public Provider<ClassWithProvidesAnnotationInAbstractModule> getClassWithProvidesAnnotationInAbstractModule() {
     return classAPIProvider;
   }
 
@@ -44,6 +49,10 @@ class TestInjection implements InjectionTesting {
 
   public Interface getInterface() {
     return anInterface;
+  }
+
+  public ClassWithNoBindingInAbstractModule getClassWithNoBindingInAbstractModule() {
+    return classWithNoBindingInAbstractModule;
   }
 }
 
@@ -65,13 +74,34 @@ class TestGuiceInjectModule extends AbstractModule {
   }
   @Provides
 //  @Singleton
-  ClassAPI getClassAPIProvider() {
-    return new ClassAPI();
+  ClassWithProvidesAnnotationInAbstractModule getClassAPIProvider() {
+    return new ClassWithProvidesAnnotationInAbstractModule();
   }
 }
 
-class ClassAPI {
-  public String api() {
-    return "test";
+class ClassWithProvidesAnnotationInAbstractModule {
+  public String testProvides() {
+    return "testProvidesBinding";
+  }
+}
+
+
+/**
+ * Even this class doesn't have any bindings via Abstract Module but can be injected in other class too like TestInjection
+ */
+class ClassWithNoBindingInAbstractModule {
+  Interface anInterface;
+  Provider<Interface> anInterfaceProvider;
+  @Inject
+  public ClassWithNoBindingInAbstractModule(Interface anInterface,
+                                            Provider<Interface> anInterfaceProvider) {
+    this.anInterface = anInterface;
+    this.anInterfaceProvider = anInterfaceProvider;
+  }
+  public Interface getAnInterface() {
+    return anInterface;
+  }
+  public String testNoBinding() {
+    return "testNoBinding";
   }
 }
