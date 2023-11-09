@@ -23,24 +23,27 @@ interface InjectionTesting {
 }
 class TestInjection implements InjectionTesting {
 
-  Provider<ClassWithProvidesAnnotationInAbstractModule> classAPIProvider;
+  Provider<ClassWithProvidesAnnotationInAbstractModule> classWithProvidesAnnotationInAbstractModuleProvider;
   Interface anInterface;
   Provider<Interface> anInterfaceProvider;
   ClassWithNoBindingInAbstractModule classWithNoBindingInAbstractModule;
+  Provider<ClassWithNoBindingInAbstractModule> classWithNoBindingInAbstractModuleProvider;
 
   @Inject
-  public TestInjection (Provider<ClassWithProvidesAnnotationInAbstractModule> classAPIProvider,
+  public TestInjection (Provider<ClassWithProvidesAnnotationInAbstractModule> classWithProvidesAnnotationInAbstractModuleProvider,
                         Interface anInterface,
                         Provider<Interface> anInterfaceProvider,
-                        ClassWithNoBindingInAbstractModule classWithNoBindingInAbstractModule) {
-    this.classAPIProvider = classAPIProvider;
+                        ClassWithNoBindingInAbstractModule classWithNoBindingInAbstractModule,
+                        Provider<ClassWithNoBindingInAbstractModule> classWithNoBindingInAbstractModuleProvider) {
+    this.classWithProvidesAnnotationInAbstractModuleProvider = classWithProvidesAnnotationInAbstractModuleProvider;
     this.anInterface = anInterface;
     this.anInterfaceProvider = anInterfaceProvider;
     this.classWithNoBindingInAbstractModule = classWithNoBindingInAbstractModule;
+    this.classWithNoBindingInAbstractModuleProvider = classWithNoBindingInAbstractModuleProvider;
   }
 
   public Provider<ClassWithProvidesAnnotationInAbstractModule> getClassWithProvidesAnnotationInAbstractModule() {
-    return classAPIProvider;
+    return classWithProvidesAnnotationInAbstractModuleProvider;
   }
 
   public Provider<Interface> getInterfaceProvider() {
@@ -87,7 +90,7 @@ class ClassWithProvidesAnnotationInAbstractModule {
 
 
 /**
- * Even this class doesn't have any bindings via Abstract Module but can be injected in other class too like TestInjection
+ * Even this class doesn't have any bindings via Abstract Module but injection can be done of this class as other classes
  */
 class ClassWithNoBindingInAbstractModule {
   Interface anInterface;
